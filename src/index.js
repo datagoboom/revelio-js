@@ -3,6 +3,7 @@
 const axios = require('axios');
 const beautify = require('js-beautify').js;
 const fs = require('fs');
+const path = require('path');
 const { Command } = require('commander');
 
 const program = new Command();
@@ -17,20 +18,10 @@ program
   .description('Dictionary mode: Search for specific variable names')
   .option('-u, --url <url>', 'URL of the JavaScript file to analyze')
   .option('-U, --url-list <file>', 'Path to a file containing a list of URLs to analyze')
-  .option('-w, --wordlist <file>', 'Path to a wordlist file containing variables to search for')
+  .option('-w, --word <variable>', 'Specific variable to search for (can be used multiple times)', (val, acc) => acc.concat(val), [])
+  .option('-W, --wordlist <file>', 'Path to a wordlist file containing variables to search for')
   .option('-o, --output <file>', 'File to save the output')
   .action(dictionaryMode);
-
-program
-  .command('enum')
-  .description('Enumeration mode: Extract all string-assigned variables')
-  .option('-u, --url <url>', 'URL of the JavaScript file to analyze')
-  .option('-U, --url-list <file>', 'Path to a file containing a list of URLs to analyze')
-  .option('-f, --filter <list>', 'Comma-separated list of filter words', commaSeparatedList)
-  .option('-l, --min-length <number>', 'Minimum variable name length', parseInt, 0)
-  .option('-o, --output <file>', 'File to save the output')
-  .action(enumerationMode);
-
 program.parse(process.argv);
 
 function commaSeparatedList(value) {
@@ -131,7 +122,27 @@ function formatResults(results) {
 
 async function dictionaryMode(options) {
   const urls = options.url ? [options.url] : (options.urlList ? readFromFile(options.urlList) : []);
-  const variables = options.wordlist ? readFromFile(options.wordlist) : [];
+  let variables = [];
+
+  // Use provided words if any
+  if (options.word && options.word.length > 0) {
+    variables = options.word;
+  }
+  // Use provided wordlist if specified
+  else if (options.wordlist) {
+    variables = readFromFile(options.wordlist);
+  }
+  // Use default wordlist
+  else {
+    const defaultWordlistPath = path.join(__dirname, '../lib/wordlist.txt');
+    try {
+      variables = readFromFile(defaultWordlistPath);
+    } catch (error) {
+      console.error(`Error reading default wordlist: ${error.message}`);
+      console.error('Please provide a wordlist using -W option or individual words using -w option. (default wordlist used unless specified)');
+      process.exit(1);
+    }
+  }
 
   if (urls.length === 0) {
     console.error('No URLs provided. Use -u or -U to provide URLs.');
@@ -139,7 +150,7 @@ async function dictionaryMode(options) {
   }
 
   if (variables.length === 0) {
-    console.error('No variables provided. Use -w to provide a wordlist.');
+    console.error('No variables provided and default wordlist is empty or missing.');
     process.exit(1);
   }
 
