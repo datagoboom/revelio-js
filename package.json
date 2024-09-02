@@ -1,6 +1,6 @@
 {
   "name": "revelio-js",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Easily reveal credentials in minified Javascript",
   "main": "src/index.js",
   "bin": {
@@ -10,7 +10,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": ["security", "javascript", "minification", "secrets"],
-  "author": "datagoboom",
+  "author": "Andrew Long (datagoboom)",
+  "repository": "https://github.com/datagoboom/revelio-js",
+  "homepage": "https://github.com/datagoboom/revelio-js#readme",
   "license": "MIT",
   "dependencies": {
     "axios": "^0.21.1",

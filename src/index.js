@@ -8,10 +8,11 @@ const { Command } = require('commander');
 
 const program = new Command();
 
+// pull version from package.json
 program
   .name('revelio-js')
   .description('A tool to uncover secrets in minified JavaScript files')
-  .version('1.2.1');
+  .version(require('../package.json').version);
 
 program
   .command('dict')
