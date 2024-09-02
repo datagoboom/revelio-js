@@ -1,6 +1,6 @@
 {
   "name": "revelio-js",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Easily reveal credentials in minified Javascript",
   "main": "src/index.js",
   "bin": {

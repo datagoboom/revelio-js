@@ -29,8 +29,11 @@ revelio-js dict [options]
 Options:
 - `-u, --url <url>`: URL of the JavaScript file to analyze
 - `-U, --url-list <file>`: Path to a file containing a list of URLs to analyze
-- `-w, --wordlist <file>`: Path to a wordlist file containing variables to search for
+- `-w, --word <variable>`: Specific variable to search for (can be used multiple times)
+- `-W, --wordlist <file>`: Path to a wordlist file containing variables to search for
 - `-o, --output <file>`: File to save the output
+
+If no wordlist or specific words are provided, the tool will use a default wordlist located at `./lib/wordlist.txt`.
 
 ### Enumeration Mode
 
@@ -52,22 +55,32 @@ Options:
 Search for specific sensitive variables in a single JavaScript file:
 
 ```
-revelio-js dict -w common_secrets.txt -u https://example.com/app.min.js -o exposed_secrets.txt
+revelio-js dict -w apiKey -w secretToken -u https://example.com/app.min.js -o exposed_secrets.txt
 ```
 
-This command will search for variables listed in 'common_secrets.txt' in the script at the given URL and save any findings to 'exposed_secrets.txt'.
+This command will search for 'apiKey' and 'secretToken' in the script at the given URL and save any findings to 'exposed_secrets.txt'.
 
-### 2. Dictionary Mode (Multiple URLs)
+### 2. Dictionary Mode (Custom Wordlist)
 
-Search for potential secrets across multiple URLs:
+Search for potential secrets across multiple URLs using a custom wordlist:
 
 ```
-revelio-js dict -w common_secrets.txt -U target_scripts.txt -o multi_script_secrets.txt
+revelio-js dict -W custom_wordlist.txt -U target_scripts.txt -o multi_script_secrets.txt
 ```
 
-This command will search for variables listed in 'common_secrets.txt' in all URLs listed in 'target_scripts.txt' and save the results to 'multi_script_secrets.txt'.
+This command will search for variables listed in 'custom_wordlist.txt' in all URLs listed in 'target_scripts.txt' and save the results to 'multi_script_secrets.txt'.
 
-### 3. Enumeration Mode
+### 3. Dictionary Mode (Default Wordlist)
+
+Search using the default wordlist:
+
+```
+revelio-js dict -u https://example.com/app.min.js -o default_search_results.txt
+```
+
+This command will use the default wordlist located at './lib/wordlist.txt' to search for variables in the given URL.
+
+### 4. Enumeration Mode
 
 Extract all string-assigned variables from a script, filtering for potential secrets:
 
@@ -77,7 +90,7 @@ revelio-js enum -u https://example.com/app.min.js -l 8 -f api,key,token,secret -
 
 This command will extract all variables assigned string values, keeping only those with names at least 8 characters long and containing 'api', 'key', 'token', or 'secret'.
 
-### 4. Quick Scan of Multiple Scripts
+### 5. Quick Scan of Multiple Scripts
 
 Quickly scan multiple scripts and display results in the console:
 
@@ -119,5 +132,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Disclaimer
 
 revelio-js is provided as-is, and is not affiliated with or endorsed by J.K. Rowling, Warner Bros., or the Harry Potter franchise. Please don't sue me.
-
-```

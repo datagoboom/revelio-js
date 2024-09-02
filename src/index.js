@@ -11,7 +11,7 @@ const program = new Command();
 program
   .name('revelio-js')
   .description('A tool to uncover secrets in minified JavaScript files')
-  .version('1.0.0');
+  .version('1.2.1');
 
 program
   .command('dict')
