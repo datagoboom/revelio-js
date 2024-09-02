@@ -4,7 +4,7 @@ Unveil the secrets hidden in minified JavaScript.
 
 ## About
 
-revelio-js is a powerful security tool designed to uncover sensitive information concealed within minified JavaScript files. Named after the revealing spell "Revelio" from the Harry Potter series, this tool is your magic wand for exposing potentially exposed secrets, credentials, and API keys in JavaScript code.
+revelio-js is a powerful security tool designed to uncover sensitive information concealed within minified JavaScript files. It can be used to search for specific variables or extract all string-assigned variables from a script, helping security professionals identify potential security risks and vulnerabilities.
 
 ## Installation
 
