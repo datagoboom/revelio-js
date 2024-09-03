@@ -16,11 +16,21 @@ npm install -g revelio-js
 
 This will make the `revelio-js` command available system-wide.
 
+For use as a library in your project:
+
+```
+npm install revelio-js
+```
+
 ## Usage
+
+revelio-js can be used both as a CLI tool and as a library in your Node.js projects.
+
+### CLI Usage
 
 revelio-js has two main modes of operation: dictionary mode (`dict`) and enumeration mode (`enum`).
 
-### Dictionary Mode
+#### Dictionary Mode
 
 ```
 revelio-js dict [options]
@@ -35,7 +45,7 @@ Options:
 
 If no wordlist or specific words are provided, the tool will use a default wordlist located at `./lib/wordlist.txt`.
 
-### Enumeration Mode
+#### Enumeration Mode
 
 ```
 revelio-js enum [options]
@@ -44,9 +54,33 @@ revelio-js enum [options]
 Options:
 - `-u, --url <url>`: URL of the JavaScript file to analyze
 - `-U, --url-list <file>`: Path to a file containing a list of URLs to analyze
-- `-f, --filter <list>`: Comma-separated list of filter words
-- `-l, --min-length <number>`: Minimum variable name length (default: 0)
+- `-f, --filter <word>`: Filter word (can be used multiple times)
+- `-F, --filter-list <file>`: Path to a file containing filter words
+- `-m, --min-length <number>`: Minimum variable name length (default: 0)
 - `-o, --output <file>`: File to save the output
+
+### Library Usage
+
+You can use revelio-js as a library in your Node.js projects:
+
+```javascript
+const Revelio = require('revelio-js');
+
+const revelio = new Revelio();
+
+// Dictionary mode
+revelio.dictionary({
+  urls: ['https://example.com/script.js'],
+  variables: ['apiKey', 'secretToken']
+}).then(results => console.log(results));
+
+// Enumeration mode
+revelio.enumerate({
+  urls: ['https://example.com/script.js'],
+  filters: ['api', 'key'],
+  minLength: 5
+}).then(results => console.log(results));
+```
 
 ## Examples
 
@@ -85,7 +119,7 @@ This command will use the default wordlist located at './lib/wordlist.txt' to se
 Extract all string-assigned variables from a script, filtering for potential secrets:
 
 ```
-revelio-js enum -u https://example.com/app.min.js -l 8 -f api,key,token,secret -o potential_exposures.txt
+revelio-js enum -u https://example.com/app.min.js -m 8 -f api -f key -f token -f secret -o potential_exposures.txt
 ```
 
 This command will extract all variables assigned string values, keeping only those with names at least 8 characters long and containing 'api', 'key', 'token', or 'secret'.
@@ -95,10 +129,41 @@ This command will extract all variables assigned string values, keeping only tho
 Quickly scan multiple scripts and display results in the console:
 
 ```
-revelio-js enum -U suspicious_scripts.txt -l 5 -f password,auth,cred
+revelio-js enum -U suspicious_scripts.txt -m 5 -f password -f auth -f cred
 ```
 
 This command will extract all variables with names at least 5 characters long from all URLs in 'suspicious_scripts.txt', filtering for terms related to authentication, and display the results in the console.
+
+### 6. Library Usage (Dictionary Mode)
+
+```javascript
+const Revelio = require('revelio-js');
+
+const revelio = new Revelio();
+
+revelio.dictionary({
+  urls: ['https://example.com/app1.min.js', 'https://example.com/app2.min.js'],
+  variables: ['apiKey', 'secretToken', 'authPassword']
+}).then(results => {
+  console.log(JSON.stringify(results, null, 2));
+});
+```
+
+### 7. Library Usage (Enumeration Mode)
+
+```javascript
+const Revelio = require('revelio-js');
+
+const revelio = new Revelio();
+
+revelio.enumerate({
+  urls: ['https://example.com/app.min.js'],
+  filters: ['api', 'key', 'token', 'secret'],
+  minLength: 8
+}).then(results => {
+  console.log(JSON.stringify(results, null, 2));
+});
+```
 
 ## Output Format
 
@@ -116,6 +181,26 @@ authPassword = "supersecret123"
 ```
 
 Each URL is enclosed in angle brackets and followed by a line of dashes. The extracted variables and their values are listed below.
+
+When used as a library, the results are returned as an array of objects, each containing the URL and an array of results:
+
+```javascript
+[
+  {
+    "url": "https://example.com/app1.min.js",
+    "results": [
+      "apiKey = \"1234567890abcdef\"",
+      "secretToken = \"vwxyz98765\""
+    ]
+  },
+  {
+    "url": "https://example.com/app2.min.js",
+    "results": [
+      "authPassword = \"supersecret123\""
+    ]
+  }
+]
+```
 
 ## Security Considerations
 
